@@ -33,6 +33,13 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
     "Accept-Encoding": "gzip, deflate, br",
     "Connection": "keep-alive",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-origin",
+    "Sec-Ch-Ua": '"Chromium";v="120", "Not_A Brand";v="24", "Google Chrome";v="120"',
+    "Sec-Ch-Ua-Mobile": "?0",
+    "Sec-Ch-Ua-Platform": '"Windows"',
+    "X-Requested-With": "XMLHttpRequest",
 }
 
 TOPIC_RULES = [
@@ -139,9 +146,13 @@ def main():
     fresh_raw = []
     try:
         session = requests.Session()
-        # Warm-up request so NSE's front door sets its usual session cookies
-        # before we hit the JSON API -- same shape as a real browser visit.
-        session.get(CIRCULARS_PAGE, headers=HEADERS, timeout=30)
+        # Warm-up requests so NSE's front door sets its usual session cookies
+        # before we hit the JSON API -- same shape as a real browser visit
+        # (home page first, then the circulars page that actually calls the API).
+        warmup_headers = {k: v for k, v in HEADERS.items() if not k.startswith("Sec-Fetch")}
+        warmup_headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        session.get("https://www.nseindia.com/", headers=warmup_headers, timeout=30)
+        session.get(CIRCULARS_PAGE, headers=warmup_headers, timeout=30)
         fresh_raw = fetch_circulars(session, from_date, to_date)
         print(f"Fetched {len(fresh_raw)} raw circulars from NSE ({from_date} to {to_date})")
     except Exception as e:
