@@ -26,8 +26,11 @@ jobs:
       - name: Install deps
         run: pip install requests beautifulsoup4 lxml
 
-      - name: Refresh notices
+      - name: Refresh BSE notices
         run: python scripts/refresh_notices.py
+
+      - name: Refresh NSE notices
+        run: python scripts/refresh_nse_notices.py
 
       - name: Commit & push if changed
         run: |
@@ -37,6 +40,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes"
           else
-            git commit -m "chore: auto-refresh BSE StAR MF notices $(date -u +%Y-%m-%d)"
+            git commit -m "chore: auto-refresh BSE & NSE MF notices $(date -u +%Y-%m-%d)"
             git push
           fi
