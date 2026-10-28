@@ -2,10 +2,8 @@ name: Refresh BSE StAR MF Notices
 
 on:
   schedule:
-    # 04:00 UTC = 09:30 IST (morning)
-    - cron: "0 4 * * *"
-    # 12:30 UTC = 18:00 IST (6:00 PM)
-    - cron: "30 12 * * *"
+    # Every 2 hours, 06:17-22:17 IST (00:47-16:47 UTC)
+    - cron: "47 0,2,4,6,8,10,12,14,16 * * *"
   workflow_dispatch:
 
 permissions:
